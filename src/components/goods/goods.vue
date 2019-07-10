@@ -38,7 +38,7 @@
           </li>
        </ul>
     </div>
-    <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
 </template>
 
@@ -88,6 +88,9 @@
         this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special'];
         this.$http.get('/api/goods').then((response) => {
           response = response.body;
+          this.$root.eventHub.$on('cart.add', (target) => {
+             this._drop(target);
+          });
           if (response.errno === ERR_OK) {
             this.goods = response.data;
             this.$nextTick(() => {
@@ -111,6 +114,9 @@
              this.scrollY = Math.abs(Math.round(pos.y));
          });
          },
+        _drop(target) {
+          this.$refs.shopcart.drop(target);
+        },
         _calculateHeight() {
            let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');
            let height = 0;
