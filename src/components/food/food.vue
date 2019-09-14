@@ -28,6 +28,11 @@
            <h1 class="title">商品信息</h1>
            <p class="text">{{food.info}}</p>
         </div>
+        <split></split>
+        <div class="rating">
+          <h1 class="title">商品评价</h1>
+          <ratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings" @on-type-select="onTypeSelect" @on-onlyContent-select="onOnlyContentSelect"></ratingselect>
+        </div>
     </div>
     </div>
   </transition>
@@ -37,7 +42,11 @@
   import BScroll from 'better-scroll';
   import cartcontrol from 'components/cartcontrol/cartcontrol';
   import split from 'components/split/split';
+  import ratingselect from 'components/ratingselect/ratingselect';
   import Vue from 'vue';
+  // const POSITIVE = 0;
+  // const NEGATIVE = 1;
+  const ALL = 2;
     export default {
         props: {
            food: {
@@ -46,12 +55,21 @@
         },
       data() {
         return {
-          showFlag: false
+          showFlag: false,
+          selectType: ALL,
+          onlyContent: true,
+          desc: {
+            all: '全部',
+            positive: '推荐',
+            negative: '吐槽'
+          }
         };
       },
         methods: {
           show() {
             this.showFlag = true;
+            this.selectType = ALL;
+            this.onlyContent = false;
             this.$nextTick(() => {
               if (!this.scroll) {
                 this.scroll = new BScroll(this.$refs.food, {
@@ -71,11 +89,18 @@
             }
             this.$root.eventHub.$emit('cart.add', event.target);
             Vue.set(this.food, 'count', 1);
+          },
+          onTypeSelect(type) {
+            this.selectType = type;
+          },
+          onOnlyContentSelect(val) {
+            this.onlyContent = val;
           }
         },
       components: {
         cartcontrol,
-        split
+        split,
+        ratingselect
       }
 
     };
@@ -174,4 +199,11 @@
         padding: 0 8px
         font-size: 12px
         color: rgb(77,85,93)
+    .rating
+      padding-top: 18px
+      .title
+        line-height: 14px
+        margin-left:18px
+        font-size: 14px
+        color: rgb(7,17,27)
 </style>
